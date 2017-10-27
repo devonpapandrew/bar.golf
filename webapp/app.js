@@ -26,6 +26,19 @@ app.controller('HomeController', function($scope, $http, SessionService) {
 
    $http.get("http://bar.golf/api/index.php/everything")
     .then(function (response) {$scope.data = response.data.data;});
+
+
+    $scope.upsertPlayerAction = function (barID, actionID) {
+        var playerID = SessionService.get("userID");
+        $http.put('http://bar.golf/api/index.php/players/' + playerID +'/' + barID + '/' + actionID, null).then(function (response) {
+            if(response.data.success == 1){
+                console.log('Successfully added '+ playerID +'/' + barID + '/' + actionID);
+            }
+            else if (response.data.success == 0){
+                window.alert('Unknown error you fool');
+            }
+        })
+    }
 	
 });
 
