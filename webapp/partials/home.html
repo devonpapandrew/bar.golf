@@ -1,0 +1,14 @@
+<a href="#!/leaderboard">Leaderboard</a>
+
+<table>
+	<tr>
+    	<th width="75px">Bar</th>
+        <th width="75px">Actions</th>
+    </tr>
+	<tr ng-repeat="bar in data.bars">
+		<td>{{ bar.name }}</td>
+        <td style="text-align: center">
+			<select ng-model="selectedName" ng-options="action.description for action in bar.actions"></select>
+        </td>
+	</tr>
+</table>

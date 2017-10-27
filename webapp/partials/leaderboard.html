@@ -1,0 +1,12 @@
+<a href="/">My Bar Golf</a>
+
+<table>
+	<tr>
+    	<th width="75px">Name</th>
+        <th width="75px">Total Score</th>
+    </tr>
+	<tr ng-repeat="x in data.players">
+		<td>{{ x.name }}</td>
+        <td style="text-align: center">{{ x.total_score }}</td>
+	</tr>
+</table>
