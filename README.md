@@ -154,7 +154,7 @@ Returns
 }
 ```
 
-### PUT `/players/{player_id}/{bar_id}/{action_id}`
+### PUT `api/index.php/players/{player_id}/{bar_id}/{action_id}`
 Returns
 ```json
 {
