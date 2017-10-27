@@ -7,7 +7,7 @@ app.controller('HomeController', function($scope, $http, SessionService) {
     var userID = SessionService.get('userID');
 
     if(! userID){
-        var userID = window.prompt('Please enter your password.');
+        userID = window.prompt('Please enter your password.');
         $http.get("http://bar.golf/api/index.php/login/" + userID)
             .then(function (response) {
                 var id = response.data.data.id;
