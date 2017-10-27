@@ -4,19 +4,37 @@ var app = angular.module('barGolf',['ngRoute']);
 app.controller('HomeController', function($scope, $http, SessionService) {
   $scope.message = 'Bar Golf';
 
+    $scope.requireLogin = function(){
+        userID = window.prompt('Please enter your password.');
+
+                if(userID) {
+                    $http.get("http://bar.golf/api/index.php/login/" + userID)
+                        .then(function (response) {
+                            if (response.data.data.id) {
+
+                                var id = response.data.data.id;
+                                var name = response.data.data.name;
+                                SessionService.set("userID", id);
+                                SessionService.set("username", name);
+
+                                $scope.user = response.data.data;
+                            }
+                            else {
+                                window.alert('Your password is incorrect. Please try again.');
+                                $scope.requireLogin();
+                            }
+                        });
+                }
+                else {
+                    window.alert('Please enter a password.');
+                    $scope.requireLogin();
+                }
+    }
+
     var userID = SessionService.get('userID');
 
     if(! userID){
-        userID = window.prompt('Please enter your password.');
-        $http.get("http://bar.golf/api/index.php/login/" + userID)
-            .then(function (response) {
-                var id = response.data.data.id;
-                var name = response.data.data.name;
-                SessionService.set("userID", id);
-                SessionService.set("username", name);
-
-                $scope.user = response.data.data;
-            });
+        $scope.requireLogin();
     }
     else {
         $scope.user = {};
@@ -39,11 +57,10 @@ app.controller('HomeController', function($scope, $http, SessionService) {
             }
         })
     }
-	
+
+
+
 });
-
-
-
 
 app.config(function($routeProvider) {
     $routeProvider
