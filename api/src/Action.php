@@ -44,6 +44,7 @@ class Action
                 $action['description'] = $description;
                 $action['numerical_score'] = $numericalScore;
                 $action['score'] = $score;
+                $action['selected'] = false;
                 $actions[] = $action;
             }
         }

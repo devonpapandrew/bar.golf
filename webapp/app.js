@@ -4,7 +4,8 @@ var app = angular.module('barGolf',['ngRoute','ui.bootstrap','ngProgress']);
 app.controller('HomeController', function($scope, $http, SessionService, ngProgressFactory) {
   $scope.message = 'Bar Golf';
 
-    var apiEndpoint = 'http://localhost/bar.golf/api/index.php/';
+    // var apiEndpoint = 'http://localhost/bar.golf/api/index.php/';
+    var apiEndpoint = 'http://bar.golf/api/index.php/';
 
     $scope.requireLogin = function(){
         userID = window.prompt('Please enter your password.');

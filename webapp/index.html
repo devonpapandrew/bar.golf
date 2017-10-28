@@ -45,8 +45,8 @@
         <tr ng-repeat="bar in data.bars">
           <td ng-class="table-warning"><a href="{{bar.url}}" target="_blank">{{bar.name}}</a></td>
           <td ng-repeat="action in bar.actions"
-              ng-class="{active: action.id && user.specificBars[bar.name].action_id == action.id}"
-              ng-click="upsertPlayerAction(bar.id, action.id)"
+              ng-class="{active: (action.id && user.specificBars[bar.name].action_id == action.id) || action.selected}"
+              ng-click="action.selected = true; upsertPlayerAction(bar.id, action.id)"
           >{{action.description}}</td>
           <td>
             <button class="btn btn-danger btn-sm" ng-if="user.specificBars[bar.name].action_id"
