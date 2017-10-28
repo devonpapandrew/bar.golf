@@ -12,32 +12,7 @@ class Player
     public static function getAll(){
         $players = array();
         $mysqli = DB::connect();
-        $sql = "SELECT DISTINCT * FROM (
-                    SELECT
-                          P.id
-                        , P.name
-                        , SUM(SUBQUERY.numerical_score)
-                        , COUNT(SUBQUERY.score)
-                    FROM Player AS P
-                    LEFT JOIN (
-                        SELECT
-                             *
-                        FROM Player_Action AS PA
-                        INNER JOIN (
-                            SELECT
-                                  A.id
-                                , A.description
-                                , S.numerical_score
-                                , S.score
-                            FROM Action AS A
-                            INNER JOIN Score AS S ON A.score = S.numerical_score
-                        ) AS SUBQUERY ON SUBQUERY.id = PA.action_id
-                    ) AS SUBQUERY ON P.id = SUBQUERY.player_id
-
-                    UNION
-                    SELECT id, name, null, null FROM Player
-                ) AS tbl
-                GROUP BY id;";
+        $sql = "SELECT id, name FROM Player;";
         $stmt = null;
         try{
             if(!$stmt = $mysqli->prepare($sql)){
@@ -49,7 +24,7 @@ class Player
             if(!$stmt->store_result()){
                 throw new Exception($mysqli->error);
             }
-            if(!$stmt->bind_result($id, $name, $totalScore, $barsCompleted)){
+            if(!$stmt->bind_result($id, $name)){
                 throw new Exception($mysqli->error);
             }
         } catch(Exception $e){
@@ -61,8 +36,8 @@ class Player
                 $player['id'] = $id;
                 $player['name'] = $name;
                 $player['bars'] = PlayerAction::get($id);
-                $player['bars_completed'] = $barsCompleted;
-                $player['total_score'] = $totalScore;
+                $player['bars_completed'] = null;
+                $player['total_score'] = self::getTotalScore($id);
                 $players[] = $player;
             }
         }
@@ -70,7 +45,70 @@ class Player
             return CannedResponse::unknownError();
         }
 
+
+        usort($players, function ($a, $b)
+        {
+            return min($a['total_score'], $b['total_score']);
+        });
+
         return $players;
+    }
+
+    public static function add($name){
+        $mysqli = DB::connect();
+        $sql = "SELECT * FROM Player WHERE name = ?;";
+        $stmt = null;
+        try{
+            if(!$stmt = $mysqli->prepare($sql)){
+                throw new Exception($mysqli->error);
+            }
+            if(!$stmt->bind_param("s", $name)){
+                throw new Exception($mysqli->error);
+            }
+            if(!$stmt->execute()){
+                throw new Exception($mysqli->error);
+            }
+            if(!$stmt->store_result()){
+                throw new Exception($mysqli->error);
+            }
+        } catch(Exception $e){
+            return CannedResponse::unknownError($e->getMessage());
+        }
+
+        if($stmt->num_rows > 0){
+            return CannedResponse::unknownError("A player named $name already exists.");
+        }
+        else {
+            $int = rand(100,999);
+            $password = $name.$int;
+            $mysqli = DB::connect();
+            $sql = "INSERT INTO Player (`name`, password) VALUES (?,?);";
+            $stmt = null;
+            try{
+                if(!$stmt = $mysqli->prepare($sql)){
+                    throw new Exception($mysqli->error);
+                }
+                if(!$stmt->bind_param("ss", $name, $password)){
+                    throw new Exception($mysqli->error);
+                }
+                if(!$stmt->execute()){
+                    throw new Exception($mysqli->error);
+                }
+                if(!$stmt->store_result()){
+                    throw new Exception($mysqli->error);
+                }
+            } catch(Exception $e){
+                return CannedResponse::unknownError($e->getMessage());
+            }
+
+            if($mysqli->insert_id){
+                return CannedResponse::success("$name has been added. Their password is $password");
+            }
+            else{
+                return CannedResponse::unknownError();
+            }
+        }
+
     }
 
     public static function login($password){
@@ -108,5 +146,41 @@ class Player
         }
         return $player;
     }
+
+    public static function getTotalScore($playerID){
+        $totalScore = null;
+        $mysqli = DB::connect();
+        $sql = "SELECT SUM(A.score)
+                FROM `Player_Action` PA 
+                INNER JOIN Action A ON PA.action_id = A.id
+                WHERE PA.player_id = ?";
+        $stmt = null;
+        try{
+            if(!$stmt = $mysqli->prepare($sql)){
+                throw new Exception($mysqli->error);
+            }
+            if(!$stmt->bind_param("i", $playerID)){
+                throw new Exception($mysqli->error);
+            }
+            if(!$stmt->execute()){
+                throw new Exception($mysqli->error);
+            }
+            if(!$stmt->store_result()){
+                throw new Exception($mysqli->error);
+            }
+            if(!$stmt->bind_result($score)){
+                throw new Exception($mysqli->error);
+            }
+        } catch(Exception $e){
+            return CannedResponse::unknownError($e->getMessage());
+        }
+        if($stmt->num_rows == 1){
+            while($stmt->fetch()){
+                $totalScore = $score;
+            }
+        }
+        return $totalScore;
+    }
+
 
 }

@@ -12,13 +12,12 @@ class Action
         $actions = array();
         $mysqli = DB::connect();
         $sql = "SELECT
-                      A.id
-                    , A.description
-                    , S.numerical_score
-                    , S.score
-                FROM Action AS A
-                INNER JOIN Score AS S ON A.score = S.numerical_score
-                WHERE A.bar_id = ?;";
+                    id, description, S.numerical_score, S.score
+                FROM Score AS S
+               	LEFT JOIN (
+                    SELECT A.id, A.description, A.score FROM Action AS A WHERE A.bar_id = ?) AS tbl
+                    ON tbl.score = S.numerical_score
+                ORDER BY S.numerical_score DESC;";
         $stmt = null;
         try{
             if(!$stmt = $mysqli->prepare($sql)){

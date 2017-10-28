@@ -86,5 +86,28 @@ class PlayerAction
 
     }
 
+    public static function delete($barID, $playerID){
+        $mysqli = DB::connect();
+        $sql = "DELETE FROM Player_Action WHERE bar_id = ? AND player_id = ?";
+        $stmt = null;
+        try{
+            if(!$stmt = $mysqli->prepare($sql)){
+                throw new Exception($mysqli->error);
+            }
+            if(!$stmt->bind_param("ii", $barID, $playerID)){
+                throw new Exception($mysqli->error);
+            }
+            if(!$stmt->execute()){
+                throw new Exception($mysqli->error);
+            }
+            if(!$stmt->store_result()){
+                throw new Exception($mysqli->error);
+            }
+        } catch(Exception $e){
+            return CannedResponse::unknownError($e->getMessage());
+        }
+        return CannedResponse::success("Success");
+    }
+
 
 }

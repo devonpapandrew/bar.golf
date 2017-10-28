@@ -23,7 +23,7 @@ class CannedResponse
 
     public static function unknownError($message = "Sorry, an unknown error has occured. Please try again, or contact support@siteliteapp.com if the problem persists." ){
         $response['body'] = self::error($message);
-        $response['httpStatusCode'] = 500;
+        $response['httpStatusCode'] = 200;
         return $response;
     }
 

@@ -38,6 +38,16 @@ $app->put('/players/{playerID}/{barID}/{actionID}', function (Application $app, 
     return new Response(json_encode($response['body']), $response['httpStatusCode']);
 });
 
+$app->delete('/players/{playerID}/{barID}', function (Application $app, $playerID, $barID, Request $request) {
+    $response = PlayerAction::delete($barID, $playerID);
+    return new Response(json_encode($response['body']), $response['httpStatusCode']);
+});
+
+$app->post('/players/{name}', function (Application $app, $name, Request $request) {
+    $response = Player::add($name);
+    return new Response(json_encode($response['body']), $response['httpStatusCode']);
+});
+
 $app->run();
 
 
