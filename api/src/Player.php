@@ -9,7 +9,7 @@
 class Player
 {
 
-    public static function getAll(){
+    public static function getAll($playerID){
         $players = array();
         $mysqli = DB::connect();
         $sql = "SELECT id, name FROM Player;";
@@ -35,7 +35,9 @@ class Player
             while($stmt->fetch()){
                 $player['id'] = $id;
                 $player['name'] = $name;
-                $player['bars'] = PlayerAction::get($id);
+                if($playerID == $id){
+                    $player['bars'] = PlayerAction::get($id);
+                }
                 $player['bars_completed'] = null;
                 $player['total_score'] = self::getTotalScore($id);
                 $players[] = $player;

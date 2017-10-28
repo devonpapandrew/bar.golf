@@ -25,8 +25,8 @@ $app->get('login/{password}', function (Application $app, $password, Request $re
     return new Response(json_encode($response['body']), $response['httpStatusCode']);
 });
 
-$app->get('everything', function (Application $app, Request $request) {
-    $everything['players'] = Player::getAll();
+$app->get('everything/{playerID}', function (Application $app,$playerID, Request $request) {
+    $everything['players'] = Player::getAll($playerID);
     $everything['bars'] = Bar::get();
     $response = CannedResponse::success($everything);
     return new Response(json_encode($response['body']), $response['httpStatusCode']);

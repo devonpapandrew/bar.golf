@@ -47,7 +47,7 @@ app.controller('HomeController', function($scope, $http, SessionService, ngProgr
    $scope.getEverything = function(){
        $scope.progressbar = ngProgressFactory.createInstance();
        $scope.progressbar.start();
-       return $http.get(apiEndpoint + "everything")
+       return $http.get(apiEndpoint + "everything/" + $scope.user.id)
            .then(function (response) {
                $scope.data = response.data.data;
 
